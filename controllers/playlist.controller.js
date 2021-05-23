@@ -52,15 +52,20 @@ const addToPlaylist = async (req, res) => {
 const removeFromPlaylist = async (req, res) => {
     try {
         const { playlistName, videoId } = req.body;
-
-        const videoToBeRemoved = await Video.findOne({ videoId: videoId })
-        const playlistToBeRemovedFrom = await (await Playlist.findOne({ playlistName: playlistName }))
+        
+        const videoToBeRemoved = await Video.find({ videoId: videoId })
+        const playlistToBeRemovedFrom = await Playlist.findOne({ playlistName: playlistName }).populate({
+            path: 'videos',
+            model: 'Video'
+        })
 
         console.log(videoToBeRemoved, playlistToBeRemovedFrom)
-        playlistToBeRemovedFrom.videos.pull({ _id: videoToBeRemoved._id })
+       
+        const updatedPlaylist = playlistToBeRemovedFrom.videos.filter((item) => item !== videoToBeRemoved._id)
 
-        const updatedPlaylist = await playlistToBeRemovedFrom.save();
-
+        
+        await updatedPlaylist.save();
+        console.log(updatedPlaylist)
         res.status(200).json({ success: true, message: "Video Removed From Playlist", updatedPlaylist });
 
 
