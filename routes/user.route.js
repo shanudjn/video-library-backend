@@ -6,7 +6,8 @@ const { register, login, getUserDetails } = require('../controllers/user.control
 
 router.route('/register').post(register);
 router.route('/login').post(login);
-router.param(authenticationVerifier);
+
+router.use(authenticationVerifier);
 
 //remove this later
 router.route('/:userId').get(getUserDetails);
