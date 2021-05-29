@@ -33,7 +33,7 @@ const addToPlaylist = async (req, res) => {
     try {
         const { playlistName, videoId } = req.body;
 
-        const videoToBeAdded = await Video.findOne({ videoId: videoId })
+        const videoToBeAdded = await Video.findOne({ _id: videoId })
         console.log(videoToBeAdded)
         const videoToBeAddedPlaylist = await Playlist.findOne({ playlistName: playlistName })
 
@@ -52,25 +52,27 @@ const addToPlaylist = async (req, res) => {
 const removeFromPlaylist = async (req, res) => {
     try {
         const { playlistName, videoId } = req.body;
-        
-        const videoToBeRemoved = await Video.find({ videoId: videoId })
+
+
+
+        const videoToBeRemoved = await Video.findOne({ _id: videoId })
         const playlistToBeRemovedFrom = await Playlist.findOne({ playlistName: playlistName }).populate({
             path: 'videos',
             model: 'Video'
         })
 
-        console.log(videoToBeRemoved, playlistToBeRemovedFrom)
-       
-        const updatedPlaylist = playlistToBeRemovedFrom.videos.filter((item) => item !== videoToBeRemoved._id)
 
-        
-        await updatedPlaylist.save();
-        console.log(updatedPlaylist)
+        const updatedPlaylist = playlistToBeRemovedFrom.videos.filter(item => String(item._id) !== String(videoToBeRemoved._id))
+
+        const response = await Playlist.updateOne({ _id: playlistToBeRemovedFrom._id }, { videos: updatedPlaylist })
+
+
+
         res.status(200).json({ success: true, message: "Video Removed From Playlist", updatedPlaylist });
 
 
     } catch (error) {
-        res.status(500).json({ success: false, message: "Failed To Remove From Playlist" })
+        res.status(500).json({ success: false, message: "Failed To Remove From Playlist", msg: error.message })
     }
 }
 
