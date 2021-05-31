@@ -1,5 +1,6 @@
-const { Video } = require('../models/video.model')
-const { Playlist } = require('../models/playlist.model')
+const { Video } = require('../models/video.model');
+const { Playlist } = require('../models/playlist.model');
+const { extend } = require("lodash")
 
 
 const getAllPlaylist = async (req, res) => {
@@ -52,9 +53,6 @@ const addToPlaylist = async (req, res) => {
 const removeFromPlaylist = async (req, res) => {
     try {
         const { playlistName, videoId } = req.body;
-
-
-
         const videoToBeRemoved = await Video.findOne({ _id: videoId })
         const playlistToBeRemovedFrom = await Playlist.findOne({ playlistName: playlistName }).populate({
             path: 'videos',
@@ -76,4 +74,65 @@ const removeFromPlaylist = async (req, res) => {
     }
 }
 
-module.exports = { getAllPlaylist, addToPlaylist, createPlaylist, removeFromPlaylist }
+const getUserPlaylist = async (req, res) => {
+    try {
+        const { userId } = req.user
+        console.log("userID from authenticator", userId)
+        const playlist = await Playlist.find({}).populate({
+            path: 'videos',
+            model: 'Video'
+        });
+        res.status(200).json({ success: true, playlist })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false, error: error.message })
+    }
+}
+const getPlaylist = async (req, res) => {
+    try {
+        const { playlistId } = req.params
+
+        console.log(playlistId);
+
+        const playlist = await Playlist.findById({ _id: playlistId }).populate(
+            {
+                path: 'videos',
+                model: 'Video'
+            }
+        )
+        console.log(playlist)
+        res.status(200).json({ success: true, playlist })
+    }
+    catch (error) {
+        console.log(error)
+        res.status(500).json({ success: false, error: error.message })
+    }
+
+}
+
+const addToAPlaylist = async (req, res) => {
+    try {
+        const { videoId } = req.body
+        const { playlistId } = req.params
+
+        const playlist = await Playlist.findById({ _id: playlistId })
+
+        playlist.videos.push(videoId);
+
+        const updatedPlaylist = await playlist.save();
+        res.json({ success: true, updatedPlaylist })
+    }
+    catch (error) {
+        res.json({ success: false, error: error.message })
+    }
+}
+
+const removeFromAPlaylist = async (req, res) => {
+    const { videoId } = req.body
+    console.log(videoId)
+}
+
+module.exports = { getAllPlaylist, addToPlaylist, createPlaylist, removeFromPlaylist, getUserPlaylist, getPlaylist, addToAPlaylist, removeFromAPlaylist }
+
+
+

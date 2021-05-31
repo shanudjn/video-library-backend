@@ -24,7 +24,7 @@ const register = async (req, res) => {
 }
 
 const login = async (req, res) => {
-    const { username, password } = req.body;
+    const { username, password } = req.body.user;
     const secret = process.env['SECRET'];
 
     try {
@@ -33,10 +33,11 @@ const login = async (req, res) => {
         if (user) {
             const validPassword = await bcrypt.compare(password, user.password);
             if (validPassword) {
-                return res.status(200).json({ success: true, message: "Login Successfull", user })
+                const token = jwt.sign({ userId: user._id }, secret, { expiresIn: '24h' })
+                return res.status(200).json({ success: true, message: "Login Successfull", username, token })
             }
         }
-        res.status(400).json({ success: false, message: "User not registered" });
+        res.status(400).json({ success: false, message: "User not registered", });
 
     } catch (error) {
         console.error(error)

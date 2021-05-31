@@ -9,6 +9,7 @@ router.route('/login').post(login);
 
 router.use(authenticationVerifier);
 
+
 //remove this later
 router.route('/:userId').get(getUserDetails);
 
