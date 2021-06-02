@@ -24,6 +24,7 @@ app.use(express.json());
 const videos = require('./routes/video.router');
 const playlist = require('./routes/playlist.router');
 const users = require('./routes/user.route');
+const notes = require('./routes/notes.router');
 
 initializeDBConnection();
 
@@ -35,11 +36,9 @@ app.get('/', (req, res) => {
 
 //Routers
 app.use('/videos', videos);
-
-
 app.use('/playlist', playlist);
 app.use('/users', users)
-
+app.use('/notes', notes)
 
 
 

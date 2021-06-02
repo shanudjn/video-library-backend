@@ -56,5 +56,14 @@ const getUserDetails = async (req, res) => {
 
 
 }
-
-module.exports = { register, login, getUserDetails }
+const getAllusers = async (req, res) => {
+    try {
+        console.log("gettingAllUsers")
+        const allUsers = await User.find({})
+        res.json({ success: true, allUsers })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: "Could not get all users" })
+    }
+}
+module.exports = { register, login, getUserDetails, getAllusers }
