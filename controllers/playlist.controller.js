@@ -147,12 +147,13 @@ const createNewPlaylist = async (req, res) => {
     try {
         const { playlistName } = req.body;
         const { userId } = req.user
-        const newPlaylist = await new Playlist({ userId: userId, playlistName: playlistName })
+        const newPlaylist = await new Playlist({ userId: userId, playlistName: playlistName, videos: [] })
+        console.log(newPlaylist)
         await newPlaylist.save();
 
         res.status(200).json({ success: true, message: "Created Playlist Successfully", playlist: newPlaylist })
     } catch (error) {
-        res.json(500).json({ success: false, message: "Error Creating Playlist" })
+        res.status(500).json({ success: false, message: "Error Creating Playlist" })
     }
 }
 
